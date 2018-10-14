@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse
+from django.http import Http404
 from django.template import loader
 from .models import Question
 
@@ -15,7 +16,13 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 def detail(request, question_id):
-    return HttpResponse("You are looking at question %s." % question_id)
+    try:
+        question = Question.objects.get(pk = question_id)
+        context = {'question' : question}
+    except Question.DoesNotExsist:
+        raise Http404("Question does not exist")
+    return render(request, 'polls/detail.html', context)
+
 
 def results(request, question_id):
     response = "You are looking at results for question number %s."
